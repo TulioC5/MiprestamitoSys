@@ -1,0 +1,35 @@
+<form id="login" class="container g-3 mt-5" method="POST">
+    <div class="col-lg-12 justify-content-center">
+       
+    </div>
+</form>
+
+<div id="divnavbarSupporteMenu" style="display: none;">
+    <div class="text-center">
+        <button id="botonIngresoQueja" type="button" class="btn btn-primary" onclick="location.href='/ingresoqueja'">Ingreso de Queja</button>
+        <button id="botonConsultaEstadoQueja" type="button" class="btn btn-primary" onclick="location.href='/consultaestadoqueja'">Consulta Estado de Queja</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        await tipoQuejas();
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    async function tipoQuejas() {
+        // Resto del código de la función tipoQuejas...
+    }
+
+    function redirigirModificar(id_punto) {
+        // Aquí puedes especificar la ruta que deseas abrir
+        window.location.href = '/puntoatencionM?id=' + id_punto;
+    }
+</script>

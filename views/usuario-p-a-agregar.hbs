@@ -1,0 +1,220 @@
+
+<div class="container">
+    <div id="login" class="row justify-content-center" method="POST">
+        <div class="col-lg-7 ">
+            <div class="col-12">
+                <div class="form-outline mb-3">
+                    <label class="form-label">DPI</label>
+                    <input type="hidden" id="id_dpi">
+                    <input required type="text" onchange="getID(this)" class="form-control" id="dpi" name="dpi">                    
+                </div>
+                <div class="form-outline mb-3">
+                    <label class="form-label">Region</label>
+                    <select class="form-control" onchange="getPuntoAtencion(this)" required name="region" id="region"></select>
+                </div>
+                <div class="form-outline mb-3">
+                    <label class="form-label">Punto de atencion</label>
+                    <select class="form-control" required name="punto_atencion" id="punto_atencion"></select>
+                </div>
+                <div class="form-outline mb-3">
+                    <button class="btn btn-success" onclick="guardarValidacion()" type="button">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        await region();
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+
+    });
+
+    getID = async (val) => {
+        data = JSON.stringify({
+            dpi: val.value,
+        })
+
+        const response = await fetch('/api/usuarioPunto/getID', {
+            method:"POST",
+            headers:header,
+            body:data
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            if (resultadoConsulta.length == 0){
+                Swal.fire({
+                    icon: 'warning',
+                    text: 'DPI no existe, favor intente con otro',
+                });
+            }else{
+                resultadoConsulta.forEach(e => {
+                    document.getElementById('id_dpi').value = e.Id_Usuario;
+                });
+            }
+            
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    getPuntoAtencion = async (val) => {
+        data = JSON.stringify({
+            region: val.value,
+        })
+
+        const response = await fetch('/api/usuarioPunto/puntoAtencion', {
+            method:"POST",
+            headers:header,
+            body:data
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            let selectInput = document.getElementById('punto_atencion');
+            for(let i=selectInput.childNodes.length-1; i>=0; i--) {
+            selectInput.childNodes[i].remove(i);
+        }
+            let id =  '';
+            let name = '---';
+            let opt = document.createElement('option');
+            opt.value = id;
+            opt.innerHTML = name;
+            selectInput.appendChild(opt);
+            
+            resultadoConsulta.forEach(e => {
+                let id_region = e.Id_PuntoA;
+                let descripcion = e.Descripcion;
+                let id = id_region;
+                let name = descripcion;
+                let opt = document.createElement('option');
+                opt.value = id;
+                opt.innerHTML = name;
+                selectInput.appendChild(opt);
+
+            });
+           
+            
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    region = async () => {
+
+        const response = await fetch('/api/regiones/obtenerRegiones', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            let selectInput = document.getElementById('region');
+            let id =  '';
+            let name = '---';
+            let opt = document.createElement('option');
+            opt.value = id;
+            opt.innerHTML = name;
+            selectInput.appendChild(opt);
+            
+            resultadoConsulta.forEach(e => {
+                let id_region = e.Id_Region;
+                let descripcion = e.Descripcion;
+                let id = id_region;
+                let name = descripcion;
+                let opt = document.createElement('option');
+                opt.value = id;
+                opt.innerHTML = name;
+                selectInput.appendChild(opt);
+
+            });
+
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    guardarValidacion = async () =>{
+        let dpi =  document.getElementById('id_dpi').value;
+        let punto_atencion = document.getElementById('punto_atencion').value;
+
+        if (region == ''){
+            Swal.fire({
+                icon: 'error',
+                text: 'Seleccione region',
+            });
+            return
+        }
+
+        if (punto_atencion == ''){
+            Swal.fire({
+                icon: 'error',
+                text: 'Ingrese descripcion',
+            });
+            return
+        }
+
+        data = JSON.stringify({
+            Usuario : dpi,
+            Id_PuntoA: punto_atencion,
+        })
+
+        const response = await fetch('/api/usuarioPunto/asignarPuntoUsuario', {
+            method:"POST",
+            headers:header,
+            body: data,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+        let statusCode = response.status;
+        let body = response.body;
+
+        if (statusCode == 200){
+            Swal.fire({
+                icon: 'success',
+                text: 'Dato guardado',
+                allowOutsideClick: false
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    window.location = '/usuario-p-a'
+                }
+            })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en guardar los datos',
+                allowOutsideClick: false
+            });
+        }
+    }
+</script>

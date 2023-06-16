@@ -1,0 +1,104 @@
+<form id="actualizarPuntoForm" class="container g-3 mt-5" method="POST">
+  <div class="col-lg-12 justify-content-center">
+    <div class="mb-3">
+
+      <label for="descripcion" class="form-label">Descripción:</label>
+      <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+      <label for="descripcion1" class="form-label">Descripción actual:</label>
+      <input type="text" class="form-control" id="descripcion1" name="descripcion1" readonly>
+            <input type="hidden" id="idRegion" name="idRegion">
+
+    </div>
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary">Actualizar</button>
+      <a href="/puntoatencion" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+  let jwt = localStorage.jwt;
+  const header = new Headers();
+  header.append('authorization', `Bearer ${jwt}`);
+  header.append('Accept', `application/json`);
+  header.append('Content-Type', `application/json`);
+   console.log(jwt)
+
+  document.addEventListener('DOMContentLoaded', async e => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const puntoId = urlParams.get('id');
+    await obtenerPunto(puntoId);
+  });
+
+obtenerPunto = async (puntoId) => {
+  const response = await fetch(`/api/punto_atencion/obtenerPuntos`, {
+    method: "GET",
+    headers: header,
+  }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
+  let statusCode = response.status;
+  let body = response.body;
+
+  if (statusCode == 200) {
+    let puntos = body.resultadoConsulta;
+    let punto = puntos.find(p => p.Id_PuntoA == puntoId);
+
+    if (punto) {
+      document.getElementById('descripcion').value = punto.Descripcion;
+      document.getElementById('descripcion1').value = punto.Descripcion1;
+      document.getElementById('region').value = punto.Region;
+        document.getElementById('idRegion').value = punto.Id_Region;
+    } else {
+      Swal.fire({
+        icon: 'error',
+        text: 'El punto de atención no fue encontrado',
+      });
+    }
+  } else {
+    Swal.fire({
+      icon: 'error',
+      text: 'Hubo un error al obtener los puntos de atención',
+    });
+  }
+}
+
+document.getElementById('actualizarPuntoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const urlParams = new URLSearchParams(window.location.search);
+  const puntoId = urlParams.get('id');
+  const descripcion = document.getElementById('descripcion').value;
+  const idRegion = document.getElementById('idRegion').value;
+
+  const data = JSON.stringify({
+    Id_PuntoA: puntoId,
+    Descripcion: descripcion,
+    Id_Region: idRegion,
+  });
+
+    const response = await fetch('/api/punto_atencion/actualizarPunto', {
+      method: "POST",
+      headers: header,
+      body: data,
+    }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
+    let statusCode = response.status;
+    let body = response.body;
+
+    if (statusCode == 401) {
+      Swal.fire({
+        icon: 'success',
+        text: 'Descripción del punto de atención actualizada',
+        allowOutsideClick: false
+      }).then(function (isConfirm) {
+        if (isConfirm) {
+          window.location = '/puntoatencion';
+        }
+      })
+    } else {
+      Swal.fire({
+        icon: 'error',
+        text: 'Hubo un error en el servidorjajajaj',
+      });
+    }
+  });
+</script>

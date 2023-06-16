@@ -1,0 +1,382 @@
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="staticBackdropBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="buttonActiveModal"></button>
+
+<form id="login" class="container g-3 mt-5" method="POST">
+    <div class="col-lg-12 justify-content-center ">
+        <table class="table table-striped" id="tableData">
+            <caption>
+                <button id="buttonAgregar" type="button" onclick="window.location='puntoatencion/agregar'" class="btn btn-success">Agregar</button>
+            </caption>
+            <thead>
+                <tr>
+                    <th>Correlativo</th>
+                    <th>Fecha</th>
+                    <th>Nombre</th>
+                    <th>Origen</th>
+                    <th>Ver</th>
+                    <th>Asignar</th>
+                    <th>Detalle</th>
+                    <th>Rechazar</th>
+                </tr>
+            </thead>
+            <tbody id="idBody"></tbody>
+
+        </table>
+    </div>
+</form>
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        await tipoQuejas();
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    tipoQuejas = async () => {
+
+        const response = await fetch('/api/quejaing/obtenerq', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            console.debug(resultadoConsulta);
+            resultadoConsulta.forEach(e => {
+                let descripcion = e.Descripcion;
+                let id_punto = e.Id_Queja;
+                let descripcion1 = e.Descripcion1;
+                let Siglas = e.Siglas;
+                let Fecha_Queja = e.Fecha_Queja;
+                let Nombres = e.Nombres;
+                let Id_Origen = e.Id_Origen;
+
+
+                table = `
+                    <tr>
+                        <td>${Siglas}</td>
+                        <td>${Fecha_Queja}</td>
+                        <td>${Nombres}</td>
+                        <td>${Id_Origen}</td>
+                        <td>
+                            <input type="hidden" id="json${id_punto}">
+                            <button id="ver${id_punto}" type="button" class="btn btn-info" onclick="ver('${id_punto}')">V</button>
+                        </td>
+                        <td>
+                            <button id="asignar${id_punto}" type="button" class="btn btn-info" onclick="asignar('${id_punto}')">A</button>
+                        </td>
+                        <td>
+                            <button id="detalle${id_punto}" type="button" class="btn btn-info" onclick="detalle('${id_punto}')">D</button>
+                        </td>
+                        <td>
+                            <button id="rechazar${id_punto}" type="button" class="btn btn-info" onclick="rechazar('${id_punto}')">R</button>
+                        </td>
+                    </tr>
+                `;
+
+                document.getElementById('idBody').insertAdjacentHTML('beforeend', table);
+                document.getElementById(`json${id_punto}`).value = JSON.stringify(e);
+            });
+                        
+
+            $('#tableData').dataTable({
+                "language": {
+                    "sProcessing":    "Procesando...",
+                    "sLengthMenu":    "Mostrar _MENU_ registros",
+                    "sZeroRecords":   "No se encontraron resultados",
+                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
+                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":   "",
+                    "sSearch":        "Buscar:",
+                    "sUrl":           "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":    "Último",
+                        "sNext":    "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    eliminarPunto = async (id) => {
+
+        data = JSON.stringify({
+            Id_PuntoA : id,
+        })
+
+        const response = await fetch('/api/quejaing/eliminarPunto', {
+            method:"POST",
+            headers:header,
+            body: data,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        let statusCode = response.status;
+        let body = response.body;
+        if (statusCode == 200){
+            Swal.fire({
+                icon: 'success',
+                text: 'Punto de atencion , desactivado',
+                allowOutsideClick: false
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    window.location = '/puntoatencion'
+                }
+            })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en el servidor',
+            });
+        }
+    }
+
+    ver = async (val) => {
+        
+        let json = document.getElementById(`json${val}`).value;
+        let jsonParse = JSON.parse(json);
+        let label = document.getElementById('staticBackdropLabel');
+        let body = document.getElementById('staticBackdropBody');
+        label.innerHTML = '';
+        body.innerHTML = '';
+        label.innerHTML = 'Ficha'
+
+        let divInfo = `
+            <div class="col-12"><b>Nombre:</b> ${jsonParse.Nombres} ${jsonParse.Apellidos}</div>
+            <div class="col-12"><b>Correo:</b> ${jsonParse.Correo_email}</div>
+            <div class="col-12"><b>Telefono:</b> ${jsonParse.Telefono}</div>
+            <div class="col-12"><b>Oficina:</b> ${jsonParse.Id_PuntoA}</div>
+            <div class="col-12"><b>Empleado:</b> ${jsonParse.Id_Usuario}</div>
+            <div class="col-12"><b>Detalle:</b> ${jsonParse.Detalles}</div>
+        `;
+
+        body.innerHTML = divInfo;
+
+        document.getElementById('buttonActiveModal').click();
+    }
+
+    detalle = async (val) => {
+        
+        let json = document.getElementById(`json${val}`).value;
+        let jsonParse = JSON.parse(json);
+        let id = jsonParse.Id_Queja;
+        let label = document.getElementById('staticBackdropLabel');
+        let body = document.getElementById('staticBackdropBody');
+        label.innerHTML = '';
+        body.innerHTML = '';
+        label.innerHTML = 'Detalle'
+
+        let divInfo = `
+            <div class="col-12">
+                <textarea class="form-control" id="detalle"></textarea>
+            </div>
+            <div class="mt-1 col-12">
+                <button type="button" id="save" class="btn btn-success" onclick="saveDetalle('${id}')">Agregar</button>
+            </div>
+        `;
+
+        body.innerHTML = divInfo;
+
+
+        document.getElementById('buttonActiveModal').click();
+    }
+
+    rechazar = async (val) => {
+        
+        let json = document.getElementById(`json${val}`).value;
+        let jsonParse = JSON.parse(json);
+        let id = jsonParse.Id_Queja;
+        let label = document.getElementById('staticBackdropLabel');
+        let body = document.getElementById('staticBackdropBody');
+        label.innerHTML = '';
+        body.innerHTML = '';
+        label.innerHTML = 'Justificacion'
+
+        let divInfo = `
+            <div class="col-12">
+                <textarea class="form-control" id="detalleRechazar"></textarea>
+            </div>
+            <div class="mt-1 col-12">
+                <button type="button" id="save" class="btn btn-success" onclick="saveRechazo('${id}')">Rechazar</button>
+            </div>
+        `;
+
+        body.innerHTML = divInfo;
+
+
+        document.getElementById('buttonActiveModal').click();
+    }
+
+    asignar = async (val) => {
+        
+        let json = document.getElementById(`json${val}`).value;
+        let jsonParse = JSON.parse(json);
+        let id = jsonParse.Id_Queja;
+
+        let label = document.getElementById('staticBackdropLabel');
+        let body = document.getElementById('staticBackdropBody');
+        label.innerHTML = '';
+        body.innerHTML = '';
+        label.innerHTML = 'Asignar'
+
+        let divInfo = `
+             <div class="form-outline mb-3">
+                <label class="form-label">Region</label>
+                <select class="form-control" onchange="getPuntoAtencion(this)" required name="region" id="region"></select>
+            </div>
+            <div class="form-outline mb-3">
+                <label class="form-label">Punto de atencion</label>
+                <select class="form-control" required name="punto_atencion" id="punto_atencion"></select>
+            </div>
+            <div class="mt-1 col-12">
+                <button type="button" id="save" class="btn btn-success" onclick="saveAsignacion('${id}')">Asignar</button>
+            </div>
+        `;
+
+        body.innerHTML = divInfo;
+
+        document.getElementById('buttonActiveModal').click();
+        await region();
+    }
+
+    getPuntoAtencion = async (val) => {
+        data = JSON.stringify({
+            region: val.value,
+        })
+
+        const response = await fetch('/api/usuarioPunto/puntoAtencion', {
+            method:"POST",
+            headers:header,
+            body:data
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            let selectInput = document.getElementById('punto_atencion');
+            for(let i=selectInput.childNodes.length-1; i>=0; i--) {
+            selectInput.childNodes[i].remove(i);
+        }
+            let id =  '';
+            let name = '---';
+            let opt = document.createElement('option');
+            opt.value = id;
+            opt.innerHTML = name;
+            selectInput.appendChild(opt);
+            
+            resultadoConsulta.forEach(e => {
+                let id_region = e.Id_PuntoA;
+                let descripcion = e.Descripcion;
+                let id = id_region;
+                let name = descripcion;
+                let opt = document.createElement('option');
+                opt.value = id;
+                opt.innerHTML = name;
+                selectInput.appendChild(opt);
+
+            });
+           
+            
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    region = async () => {
+
+        const response = await fetch('/api/regiones/obtenerRegiones', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            let selectInput = document.getElementById('region');
+            let id =  '';
+            let name = '---';
+            let opt = document.createElement('option');
+            opt.value = id;
+            opt.innerHTML = name;
+            selectInput.appendChild(opt);
+            
+            resultadoConsulta.forEach(e => {
+                let id_region = e.Id_Region;
+                let descripcion = e.Descripcion;
+                let id = id_region;
+                let name = descripcion;
+                let opt = document.createElement('option');
+                opt.value = id;
+                opt.innerHTML = name;
+                selectInput.appendChild(opt);
+
+            });
+
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+
+function redirigirModificar(id_punto) {
+    // Aquí puedes especificar la ruta que deseas abrir
+      window.location.href = '/puntoatencionM?id=' + id_punto;
+
+}
+
+
+
+</script>

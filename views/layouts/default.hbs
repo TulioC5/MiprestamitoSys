@@ -67,11 +67,21 @@
 
                                 </div>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="queja-ingresa" href="/usuario-atencion">Quejas ingresadas por mal servicio.</a>
+
+                           <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"  href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                   Ingreso de queja por mal servicio - CA
+                                </a>
+                                <div class="dropdown-menu" id="dropQuejass" >
+                                <a class="dropdown-item" href="/auto_consulta">Consulta Estado de Queja.</a>
+
+
+                                </div>
+
                             </li>
+
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="queja-proceso" href="/usuario-atencion">Quejas por mal servicio en proceso de atención</a>
+                                <a class="nav-link" aria-current="queja-proceso" href="/quejai">Quejas ingresadas por mal servicio</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" aria-current="seguimiento" href="/usuario-atencion">Seguimiento Quejas por mal servicio asignadas</a>
@@ -86,7 +96,7 @@
                                 <a class="nav-link" aria-current="page" href="/auto_consulta">Autoconsulta</a>
                             </li>
                         </ul>
-                </div>
+                </div>  
             </div>
         </div>
     </div>
@@ -119,6 +129,7 @@
         header.append('Content-Type', `application/json`)
 
         await tipoQuejasDr();
+             await tipoQuejasDrr();
 
     });
 
@@ -152,6 +163,47 @@
                 `;
             });
             document.getElementById('dropQuejas').insertAdjacentHTML('beforeend', drop);
+
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+
+    
+    tipoQuejasDrr = async () => {
+        let jwt = localStorage.jwt;
+        const header = new Headers();
+        header.append('authorization', `Bearer ${jwt}`)
+        header.append('Accept', `application/json`)
+        header.append('Content-Type', `application/json`)
+
+        const response = await fetch('/api/tipo_queja/obtenerTipoQueja', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let drop = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            resultadoConsulta.forEach(e => {
+                let descripcion = e.Descripcion;
+                let Siglas = e.Siglas;
+                let Id_Tqueja = e.Id_Tqueja;
+
+                drop += `
+                    <a class="dropdown-item" href="/queja?sigla=${Id_Tqueja}">${descripcion}</a>
+
+                `;
+            });
+            document.getElementById('dropQuejass').insertAdjacentHTML('beforeend', drop);
 
         }else{
             Swal.fire({

@@ -57,7 +57,8 @@
                         <td>${Siglas}</td>
                         <td>${descripcion}</td>
                         <td>
-                            <button id="modificar${Id_Tqueja}" class="btn btn-success">Modificar</button>
+                            {{!-- <button id="modificar${Id_Tqueja}" class="btn btn-success">Modificar</button> --}}
+                            <button id="modificar${Id_Tqueja}" type="button" class="btn btn-success" onclick="redirigirModificar(${Id_Tqueja})">Modificar</button>
                             <button id="eliminar${Id_Tqueja}" onclick="eliminar(${Id_Tqueja})" type="button" class="btn btn-danger">Eliminar</button>
                         </td>
                     </tr>
@@ -131,4 +132,11 @@
             });
         }
     }
+
+
+
+    function redirigirModificar(Id_Tqueja) {
+      window.location.href = '/tipoquejaM?id=' + Id_Tqueja;
+
+}
 </script>

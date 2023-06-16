@@ -1,0 +1,98 @@
+<form id="modificarForm" class="container g-3 mt-5" method="POST">
+    <div class="col-lg-12 justify-content-center ">
+        <div class="mb-3">
+            <label for="idTQueja" class="form-label">ID de TQueja</label>
+            <input type="text" class="form-control" id="idTQueja" name="idTQueja" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <input type="text" class="form-control" id="descripcion" name="descripcion">
+        </div>
+        <div class="mb-3">
+            <label for="siglas" class="form-label">Siglas</label>
+            <input type="text" class="form-control" id="siglas" name="siglas">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+            console.log(jwt)
+
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idTQueja = urlParams.get('idTQueja');
+        await obtenerTipoQueja(idTQueja);
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    obtenerTipoQueja = async (idTQueja) => {
+        const response = await fetch(`/api/tipo_queja/obtenerTipoQueja?idTQueja=${idTQueja}`, {
+            method: "GET",
+            headers: header,
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
+        let statusCode = response.status;
+        let body = response.body;
+
+        if (statusCode == 200) {
+            let tipoQueja = body.resultadoConsulta[0];
+            document.getElementById('idTQueja').value = tipoQueja.Id_Tqueja;
+            document.getElementById('descripcion').value = tipoQueja.Descripcion;
+            document.getElementById('siglas').value = tipoQueja.Siglas;
+        } else {
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error al obtener los datos de tipo queja',
+            });
+        }
+    }
+
+    document.getElementById('modificarForm').addEventListener('submit', async e => {
+        e.preventDefault();
+
+        const idTQueja = document.getElementById('idTQueja').value;
+        const descripcion = document.getElementById('descripcion').value;
+        const siglas = document.getElementById('siglas').value;
+
+        const data = JSON.stringify({
+            id: 1, // Cambia este valor con el ID de usuario correcto
+            Id_TQueja: idTQueja,
+            Descripcion: descripcion,
+            Siglas: siglas
+        });
+
+        const response = await fetch('/api/tipo_queja/actualizarTipoQueja', {
+            method: "POST",
+            headers: header,
+            body: data,
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
+        let statusCode = response.status;
+        let body = response.body;
+
+        if (statusCode == 200) {
+            Swal.fire({
+                icon: 'success',
+                text: 'Tipo de queja actualizado correctamente',
+                allowOutsideClick: false
+            }).then(function (isConfirm) {
+                if (isConfirm) {
+                    window.location = '/tipoqueja'
+                }
+            })
+        } else {
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error al actualizar el tipo de queja',
+            });
+        }
+    });
+</script>

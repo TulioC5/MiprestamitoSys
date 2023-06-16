@@ -10,6 +10,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Punto atencion</th>
+                    <th>Region</th>
                     <th>Acccion</th>
                 </tr>
             </thead>
@@ -48,13 +49,16 @@
             resultadoConsulta.forEach(e => {
                 let descripcion = e.Descripcion;
                 let id_punto = e.Id_PuntoA;
+                let descripcion1 = e.Descripcion1;
+
 
                 table += `
                     <tr>
                         <td>${id_punto}</td>
                         <td>${descripcion}</td>
+                        <td>${descripcion1}</td>
                         <td>
-                            <button id="modificar${id_punto}" class="btn btn-success">Modificar</button>
+                            <button id="modificar${id_punto}" type="button" class="btn btn-success" onclick="redirigirModificar(${id_punto})">Modificar</button>
                             <button id="eliminar${id_punto}" onclick="eliminarPunto(${id_punto})" type="button" class="btn btn-danger">Eliminar</button>
                         </td>
                     </tr>
@@ -128,4 +132,14 @@
             });
         }
     }
+
+
+function redirigirModificar(id_punto) {
+    // Aquí puedes especificar la ruta que deseas abrir
+      window.location.href = '/puntoatencionM?id=' + id_punto;
+
+}
+
+
+
 </script>
