@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "creacion de apis jwt",
   "main": "index.js",
+  "nodemon":"^1.19.2",
   "scripts": {
     "start": "nodemon index.js"
   },
