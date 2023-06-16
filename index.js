@@ -84,6 +84,10 @@ app.get('/usuario-p-a-agregar', (req, res) => {
     res.render('usuario-p-a-agregar');
 });
 
+app.get('/usuariopaM', (req, res) => {
+    res.render('usuario-p-aM');
+});
+
 
 app.get('/home',(req,res)=>{
     res.render('home', {

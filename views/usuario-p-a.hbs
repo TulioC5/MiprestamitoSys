@@ -1,5 +1,3 @@
-
-
 <form id="login" class="container g-3 mt-5" method="POST">
     <div class="col-lg-12 justify-content-center ">
         <table class="table table-striped" id="tableData">
@@ -9,11 +7,11 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombe</th>
+                    <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Correo</th>
-                    <th>Punto atencion</th>
-                    <th>Acccion</th>
+                    <th>Punto de atención</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="idBody"></tbody>
@@ -24,9 +22,9 @@
 <script type="text/javascript">
     let jwt = localStorage.jwt;
     const header = new Headers();
-    header.append('authorization', `Bearer ${jwt}`)
-    header.append('Accept', `application/json`)
-    header.append('Content-Type', `application/json`)
+    header.append('authorization', `Bearer ${jwt}`);
+    header.append('Accept', `application/json`);
+    header.append('Content-Type', `application/json`);
 
     document.addEventListener('DOMContentLoaded', async e => {
         await tipoQuejas();
@@ -37,16 +35,15 @@
     tipoQuejas = async () => {
 
         const response = await fetch('/api/usuarioPunto/obtenerusuariosPA', {
-            method:"GET",
-            headers:header,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
-
+            method: "GET",
+            headers: header,
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
 
         let statusCode = response.status;
         let body = response.body;
         let table = ``;
 
-        if (statusCode == 200){
+        if (statusCode == 200) {
             let resultadoConsulta = body.resultadoConsulta;
             resultadoConsulta.forEach(e => {
                 let descripcion = e.Descripcion1;
@@ -64,7 +61,7 @@
                         <td>${Correo}</td>
                         <td>${descripcion}</td>
                         <td>
-                            <button id="modificar${id_punto}" onclick="modificarpunto(${id_punto})" type="button" class="btn btn-danger">Modificar</button>
+                            <button id="modificar${id_punto}" onclick="redirigirModificar(${id_punto})" type="button" class="btn btn-danger">Modificar</button>
                             <button id="eliminar${id_punto}" onclick="eliminarPunto(${id_punto})" type="button" class="btn btn-danger">Eliminar</button>
                         </td>
                     </tr>
@@ -75,34 +72,34 @@
 
             $('#tableData').dataTable({
                 "language": {
-                    "sProcessing":    "Procesando...",
-                    "sLengthMenu":    "Mostrar _MENU_ registros",
-                    "sZeroRecords":   "No se encontraron resultados",
-                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
-                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix":   "",
-                    "sSearch":        "Buscar:",
-                    "sUrl":           "",
-                    "sInfoThousands":  ",",
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
-                        "sFirst":    "Primero",
-                        "sLast":    "Último",
-                        "sNext":    "Siguiente",
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
                         "sPrevious": "Anterior"
                     },
                     "oAria": {
-                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                         "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                     }
                 }
             });
-        }else{
+        } else {
             Swal.fire({
                 icon: 'error',
-                text: 'Hubo un error en obtener listado',
+                text: 'Hubo un error al obtener el listado',
             });
         }
     }
@@ -110,28 +107,28 @@
     eliminarPunto = async (id) => {
 
         data = JSON.stringify({
-            Usuario : id,
-        })
+            Usuario: id,
+        });
 
         const response = await fetch('/api/usuarioPunto/eliminarPuntoUsuario', {
-            method:"POST",
-            headers:header,
+            method: "POST",
+            headers: header,
             body: data,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
 
         let statusCode = response.status;
         let body = response.body;
-        if (statusCode == 200){
+        if (statusCode == 200) {
             Swal.fire({
                 icon: 'success',
-                text: 'Punto atencion usuario, desactivado',
+                text: 'Punto de atención usuario desactivado',
                 allowOutsideClick: false
-            }).then(function(isConfirm) {
+            }).then(function (isConfirm) {
                 if (isConfirm) {
-                    window.location = '/usuario-p-a'
+                    window.location = '/usuario-p-a';
                 }
-            })
-        }else{
+            });
+        } else {
             Swal.fire({
                 icon: 'error',
                 text: 'Hubo un error en el servidor',
@@ -140,12 +137,9 @@
     }
 
 
-function redirigirModificar(id_punto) {
-    // Aquí puedes especificar la ruta que deseas abrir
-      window.location.href = '/puntoatencionM?id=' + id_punto;
-
-}
-
-
+    function redirigirModificar(id_punto) {
+        // Aquí puedes especificar la ruta que deseas abrir
+        window.location.href = '/usuariopaM?id=' + id_punto;
+    }
 
 </script>

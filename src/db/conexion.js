@@ -1,11 +1,10 @@
 var mysql = require('mysql');
 var conexion= mysql.createConnection({
-    host : 'us-cdbr-east-06.cleardb.net',
-    database : 'heroku_6f18d24c0ac41a5',
-    user : 'b3be56d84e3e72',
-    password : '090de5db',
+    host : 'den1.mysql1.gear.host',
+    database : 'quejastulio',
+    user : 'root111',
+    password : '@52547189',
 });
-
 conexion.connect(function(err) {
     if (err) {
         console.error('Error de conexion: ' + err.stack);
