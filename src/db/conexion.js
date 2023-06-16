@@ -1,9 +1,9 @@
 var mysql = require('mysql');
 var conexion= mysql.createConnection({
-    host : 'localhost',
-    database : 'quejas_tulio',
-    user : 'root',
-    password : '123',
+    host : 'us-cdbr-east-06.cleardb.net',
+    database : 'heroku_6f18d24c0ac41a5',
+    user : 'b3be56d84e3e72',
+    password : '090de5db',
 });
 
 conexion.connect(function(err) {
