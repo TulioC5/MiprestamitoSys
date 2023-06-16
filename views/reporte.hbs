@@ -1,0 +1,176 @@
+
+<div class="container">
+    <div id="login" class="row justify-content-center" method="POST">
+        <div class="col-lg-7 ">
+            <div class="row col-12 ">
+                <div class="col-6">
+                    <label class="form-label">Fecha inicial</label>
+                    <input required type="text" class="form-control" id="desde" name="desde">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Fecha final</label>
+                    <input required type="text" class="form-control" id="hasta" name="hasta">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Region</label>
+                    <input required type="text" class="form-control" id="desde" name="desde">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Punto Atencion</label>
+                    <input required type="text" class="form-control" id="hasta" name="hasta">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Queja</label>
+                    <input required type="text" class="form-control" id="hasta" name="hasta">
+                </div>
+
+                <div class="form-outline mt-2">
+                    <button class="btn btn-success" id="btnBuscar" type="button">Buscar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 mt-5">
+            <table class="table table-striped" id="tableData">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tipo</th>
+                    <th>Punto A</th>
+                    <th>Estado</th>
+                    <th>Etapa/Actual</th>
+                    <th>Resultado</th>
+                    <th>Medio Ing.</th>
+                    <th>Fecha C</th>
+                    <th>Tiempo de atencion</th>
+                    <th>Detalle</th>
+                </tr>
+                </thead>
+                <tbody id="idBody"></tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+
+        document.getElementById('btnBuscar').addEventListener('click', async function(){
+            await buscar();
+        })
+    });
+
+
+    buscar = async () =>{
+        // let siglas =  document.getElementById('siglas').value;
+        //
+        // if (siglas == ''){
+        //     Swal.fire({
+        //         icon: 'error',
+        //         text: 'Ingrese siglas',
+        //     });
+        //     return
+        // }
+        //
+        // if (recap == ''){
+        //     Swal.fire({
+        //         icon: 'error',
+        //         text: 'Valide recaptcha',
+        //     });
+        //     return
+        // }
+        //
+        let data = JSON.stringify({
+            // recap : recap,
+            Siglas: '',
+        });
+
+
+        const response = await fetch('/api/ingreso/obtenerTipoQueja', {
+            method:"GET",
+            headers: header,
+            // body:data,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 201){
+            let resultadoConsulta = body.resultadoConsulta;
+            resultadoConsulta.forEach(e => {
+                let descripcion = e.Descripcion;
+                let Siglas = e.Siglas;
+                let Id_Tqueja = e.Id_Tqueja;
+
+                table += `
+                    <tr>
+                        <td>No</td>
+                        <td>Tipo</td>
+                        <td>Punto A</td>
+                        <td>Estado</td>
+                        <td>Etapa/Actual</td>
+                        <td>Resultado</td>
+                        <td>Medio Ing.</td>
+                        <td>Fecha C</td>
+                        <td>Tiempo de atencion</td>
+                        <td>Detalle</td>
+                    </tr>
+                `;
+
+            });
+            document.getElementById('idBody').insertAdjacentHTML('beforeend', table);
+
+            let tableD = $('#tableData').dataTable({
+                "paging": false,
+                "info": false,
+                "dom": 'Bfrtip',
+                "searching":false,
+                "ordering":false,
+                buttons: {
+                    buttons: [
+                        { extend: 'excel', className: 'btn-success btn' },
+                        { extend: 'pdf', className: 'btn-danger btn' }
+                    ]
+                },
+                "language": {
+                    "sProcessing":    "Procesando...",
+                    "sLengthMenu":    "Mostrar _MENU_ registros",
+                    "sZeroRecords":   "No se encontraron resultados",
+                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
+                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":   "",
+                    "sSearch":        "Buscar:",
+                    "sUrl":           "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":    "Último",
+                        "sNext":    "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+</script>
