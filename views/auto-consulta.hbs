@@ -1,0 +1,103 @@
+<script async src="https://www.google.com/recaptcha/api.js"></script>
+<div class="container">
+    <div id="login" class="row justify-content-center" method="POST">
+        <div class="col-lg-7">
+            <div class="col-12">
+                <div class="form-outline mb-3">
+                    <label class="form-label">Siglas</label>
+                    <input required type="text" class="form-control" id="siglas" name="siglas">
+                </div>
+                <div class="form-group mt-2">
+                    <div class="g-recaptcha" data-sitekey="6Le5p3QmAAAAAMsNA5U-lEA3ehvhlghCkR09RenN"></div>
+                </div>
+                <div class="form-outline mt-2">
+                    <button class="btn btn-success" onclick="validar()" type="button">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultados" class="mt-4" style="display: none;">
+        <h3>Resultados</h3>
+        <table id="tablaResultados" class="table">
+            <thead>
+                <tr>
+                    
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Correo electrónico</th>
+                    <th>Siglas queja</th>
+                    <th>Estado queja</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyResultados"></tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    validar = async () => {
+        let recap = grecaptcha.getResponse();
+        let siglas = document.getElementById('siglas').value;
+
+        if (siglas == '') {
+            Swal.fire({
+                icon: 'error',
+                text: 'Ingrese siglas',
+            });
+            return;
+        }
+
+        if (recap == '') {
+            Swal.fire({
+                icon: 'error',
+                text: 'Valide recaptcha',
+            });
+            return;
+        }
+
+        const url = `/api/autoc/obtenerqueja?siglas=${encodeURIComponent(siglas)}`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: header,
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+        let statusCode = response.status;
+        let body = response.body;
+
+        if (statusCode == 200) {
+            let resultados = body.resultadoConsulta;
+            let tbody = document.getElementById('tbodyResultados');
+            tbody.innerHTML = '';
+            resultados.forEach(resultado => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${resultado.Nombres}</td>
+                    <td>${resultado.Apellidos}</td>
+                    <td>${resultado.Correo_email}</td>
+                    <td>${resultado.Siglas}</td>
+                    <td>${resultado.Descripcion}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('resultados').style.display = 'block';
+        } else {
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error al obtener los datos',
+                allowOutsideClick: false
+            });
+        }
+    }
+</script>

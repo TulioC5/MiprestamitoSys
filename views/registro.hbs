@@ -1,0 +1,83 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<form id="registration-form" class="container mt-5">
+  <div class="mb-3">
+    <label for="username" class="form-label">Usuario</label>
+    <input type="text" class="form-control" id="Usuario" name="Usuario" required>
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Contraseña</label>
+    <input type="password" class="form-control" id="Contraseña" name="Contraseña" required>
+  </div>
+  <div class="mb-3">
+    <label for="confirm-password" class="form-label">Confirmar Contraseña</label>
+    <input type="password" class="form-control" id="confirm-password" name="ConfirmarContraseña" required>
+  </div>
+  <div class="mb-3">
+    <label for="first-name" class="form-label">Nombres</label>
+    <input type="text" class="form-control" id="Nombres" name="Nombres" required>
+  </div>
+  <div class="mb-3">
+    <label for="last-name" class="form-label">Apellidos</label>
+    <input type="text" class="form-control" id="Apellidos" name="Apellidos" required>
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Correo electrónico</label>
+    <input type="email" class="form-control" id="Correo_email" name="Correo_email" required>
+  </div>
+  <div class="mb-3">
+    <label for="birthdate" class="form-label">Fecha de Nacimiento</label>
+    <input type="date" class="form-control" id="Fecha_Nacimiento" name="Fecha_Nacimiento" required>
+  </div>
+  <div class="mb-3">
+    <label for="cui" class="form-label">CUI</label>
+    <input type="text" class="form-control" id="Cui" name="Cui" required>
+  </div>
+  <div class="mb-3">
+    <label for="department" class="form-label">Departamento</label>
+    <input type="text" class="form-control" id="Departamento" name="Departamento" required>
+  </div>
+  <div class="mb-3">
+    <label for="account-number" class="form-label">Número de Cuenta</label>
+    <input type="text" class="form-control" id="NUMEROCUENTA" name="NUMEROCUENTA" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Registrarse</button>
+</form>
+
+<script>
+  const registrationForm = document.getElementById('registration-form');
+
+  registrationForm.addEventListener('submit', async (event) => {
+    event.preventDefault(); // Evitar el envío del formulario
+
+    const formData = new FormData(registrationForm);
+    const userData = Object.fromEntries(formData.entries()); // Convertir los datos del formulario a un objeto
+
+    // Realizar la solicitud POST a la API
+    const response = await fetch('/api/agregarusuario/agregaruser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (response.ok) {
+      // El usuario se registró correctamente
+      // Realizar acciones adicionales o redireccionar al usuario
+    alert('Gracias, su usuario ha sido ingresado con éxito. Por favor, revise su correo electrónico.');
+
+      // Redireccionar a la página de inicio de sesión
+      window.location.href = '/login'; // Reemplaza '/login' con la URL de la página de inicio de sesión
+
+
+
+      console.log('Usuario registrado correctamente');
+    } else {
+      // Hubo un error al registrar el usuario
+      const errorData = await response.json();
+      console.error('Error al registrar el usuario:', errorData.Error);
+    }
+  });
+</script>
