@@ -31,7 +31,7 @@ router.get("/obtenerPuntos", async (req, res) =>{
     try {
         const token = req.headers.authorization.split(" ")[1]
         const payload = jwt.verify(token, secret)        
-        var consulta = `SELECT tbl_puntos_atencion.Id_PuntoA,tbl_puntos_atencion.Descripcion, tbl_regiones.Descripcion as 'Descripcion1' ,tbl_regiones.Id_Region  FROM heroku_6f18d24c0ac41a5.tbl_puntos_atencion
+        var consulta = `SELECT tbl_puntos_atencion.Id_PuntoA,tbl_puntos_atencion.Descripcion, tbl_regiones.Descripcion as 'Descripcion1' ,tbl_regiones.Id_Region  FROM quejastulio.tbl_puntos_atencion
         JOIN
         
    tbl_regiones on 			tbl_puntos_atencion.id_Region = tbl_regiones.Id_Region
