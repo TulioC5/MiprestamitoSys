@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const secret = "123456";
-const tabla = 'quejas_tulio.tbl_regiones';
+const tabla = 'heroku_6f18d24c0ac41a5.tbl_regiones';
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
 
 router.get("/obtenerRegiones", async (req, res) =>{

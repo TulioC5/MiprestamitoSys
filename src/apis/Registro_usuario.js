@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const path = require('path');
 const router = express.Router();
-const tabla = 'quejas_tulio.tbl_usuarios';
+const tabla = 'heroku_6f18d24c0ac41a5.tbl_usuarios';
 const multer = require('multer');
 const fs = require('fs');
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
@@ -20,7 +20,7 @@ router.post("/agregaruser", async (req, res) =>{
             return;
         }
 
-         var consulta = `INSERT INTO quejas_tulio.tbl_usuarios(Usuario, Contraseña, Nombres, Apellidos, Correo_email, Fecha_Nacimiento, Cui, Departamento,Id_Rol,Id_Cargo,Id_PuntoA, NUMEROCUENTA,ESTADO) VALUES ('${Usuario}', SHA2('${Contraseña}', 256),'${Nombres}','${Apellidos}', '${Correo_email}','${Fecha_Nacimiento}','${Cui}','${Departamento}','4','1','1','${NUMEROCUENTA}', '1')`;        
+         var consulta = `INSERT INTO heroku_6f18d24c0ac41a5.tbl_usuarios(Usuario, Contraseña, Nombres, Apellidos, Correo_email, Fecha_Nacimiento, Cui, Departamento,Id_Rol,Id_Cargo,Id_PuntoA, NUMEROCUENTA,ESTADO) VALUES ('${Usuario}', SHA2('${Contraseña}', 256),'${Nombres}','${Apellidos}', '${Correo_email}','${Fecha_Nacimiento}','${Cui}','${Departamento}','4','1','1','${NUMEROCUENTA}', '1')`;        
         console.log(consulta);
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);

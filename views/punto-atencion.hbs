@@ -101,37 +101,42 @@
         }
     }
 
-    eliminarPunto = async (id) => {
+   eliminarPunto = async (id) => {
+  const confirmed = confirm('¿Estás seguro de desactivar este punto de atención?');
 
-        data = JSON.stringify({
-            Id_PuntoA : id,
-        })
+  if (confirmed) {
+    const data = JSON.stringify({
+      Id_PuntoA: id,
+    });
 
-        const response = await fetch('/api/punto_atencion/eliminarPunto', {
-            method:"POST",
-            headers:header,
-            body: data,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+    const response = await fetch('/api/punto_atencion/eliminarPunto', {
+      method: "POST",
+      headers: header,
+      body: data,
+    }).then(res => res.json().then(data => ({ status: res.status, body: data })));
 
-        let statusCode = response.status;
-        let body = response.body;
-        if (statusCode == 200){
-            Swal.fire({
-                icon: 'success',
-                text: 'Punto de atencion , desactivado',
-                allowOutsideClick: false
-            }).then(function(isConfirm) {
-                if (isConfirm) {
-                    window.location = '/puntoatencion'
-                }
-            })
-        }else{
-            Swal.fire({
-                icon: 'error',
-                text: 'Hubo un error en el servidor',
-            });
+    let statusCode = response.status;
+    let body = response.body;
+
+    if (statusCode == 200) {
+      Swal.fire({
+        icon: 'success',
+        text: 'Punto de atención desactivado',
+        allowOutsideClick: false
+      }).then(function(isConfirm) {
+        if (isConfirm) {
+          window.location = '/puntoatencion';
         }
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        text: 'Hubo un error en el servidor',
+      });
     }
+  }
+};
+
 
 
 function redirigirModificar(id_punto) {

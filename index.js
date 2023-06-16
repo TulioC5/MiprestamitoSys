@@ -138,6 +138,9 @@ app.get('/quejai',(req,res)=>{
     res.render('quejas-ingresadas');
 });
 
+app.get('/Portal',(req,res)=>{
+    res.render('Portal');
+});
 
 
 
