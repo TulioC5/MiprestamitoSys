@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const secret = "123456";
-const tabla = 'heroku_6f18d24c0ac41a5.tbl_usuarios';
+const tabla = 'quejastulio.tbl_usuarios';
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
 
 
@@ -103,7 +103,7 @@ router.post("/asignarPuntoUsuario", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}', 'Usuario: ${Usuario}, Id_PuntoA:${Id_PuntoA}', '${payload.user}', ${"Current_Timestamp"})`;
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}', 'Usuario: ${Usuario}, Id_PuntoA:${Id_PuntoA}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
             res.status(200).send({ Ok: "Ok" });
@@ -128,7 +128,7 @@ router.post("/eliminarPuntoUsuario", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}', 'Usuario: ${Usuario}, Id_Cargo: ${Id_Cargo}, Id_PuntoA:${Id_PuntoA}', '${payload.user}', ${"Current_Timestamp"})`;
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}', 'Usuario: ${Usuario}, Id_Cargo: ${Id_Cargo}, Id_PuntoA:${Id_PuntoA}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
             res.status(200).send({ Ok: "Ok" });
@@ -155,7 +155,7 @@ router.post("/actualizarUsuario", async (req, res) => {
   
       if (resultadoConsulta) {
         const registroBitacora = `Usuario: ${Usuario}, Nombre: ${NuevoNombre}, Correo: ${NuevoCorreo}`;
-        const consultaBitacora = `INSERT INTO heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', 'actualizar', '${registroBitacora}', '${payload.user}', Current_Timestamp)`;
+        const consultaBitacora = `INSERT INTO quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', 'actualizar', '${registroBitacora}', '${payload.user}', Current_Timestamp)`;
         console.log(consultaBitacora);
   
         const resultadoBitacora = await realizarDml(consultaBitacora);

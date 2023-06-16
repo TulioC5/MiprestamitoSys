@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const secret = "123456";
-const tabla = 'heroku_6f18d24c0ac41a5.tbl_tipo_queja';
+const tabla = 'quejastulio.tbl_tipo_queja';
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
 
 router.post("/agregarTipoQueja", async (req, res) =>{
@@ -15,7 +15,7 @@ router.post("/agregarTipoQueja", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"insertar"}', 'Descripcion: ${Descripcion}, Siglas: ${Siglas}', '${payload.user}', ${"Current_Timestamp"})`;
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"insertar"}', 'Descripcion: ${Descripcion}, Siglas: ${Siglas}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
             res.status(201).send({ Ok: "Ok" });
@@ -51,7 +51,7 @@ router.post("/actualizarTipoQueja", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}',
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}',
             'Id: ${Id_TQueja},Descripcion: ${Descripcion}, Siglas:${Siglas}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
@@ -74,7 +74,7 @@ router.post("/eliminarTipoQueja", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"eliminar"}', 'Id: ${Id_TQueja}, Estado: 2', '${payload.user}', ${"Current_Timestamp"})`;
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"eliminar"}', 'Id: ${Id_TQueja}, Estado: 2', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
             res.status(200).send({ Ok: "Ok" });
@@ -90,7 +90,7 @@ router.get("/obtenerOrigenQueja", async (req, res) =>{
     try {
         const token = req.headers.authorization.split(" ")[1]
         const payload = jwt.verify(token, secret)        
-        var consulta = `SELECT * FROM heroku_6f18d24c0ac41a5.tbl_queja_origen`;
+        var consulta = `SELECT * FROM quejastulio.tbl_queja_origen`;
         console.log(consulta);
         var resultadoConsulta = await realizarConsulta(consulta);
         console.log(resultadoConsulta);                 

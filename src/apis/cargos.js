@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const secret = "123456";
-const tabla = 'heroku_6f18d24c0ac41a5.tbl_cargos';
+const tabla = 'quejastulio.tbl_cargos';
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
 
 router.get("/obtenercargos", async (req, res) =>{

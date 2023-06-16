@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require('path');
 const router = express.Router();
-const tabla = 'heroku_6f18d24c0ac41a5.tbl_queja';
+const tabla = 'quejastulio.tbl_queja';
 const fs = require('fs');
 const jwt = require("jsonwebtoken");
 const secret = "123456";
@@ -16,8 +16,8 @@ router.get("/obtenerqueja", async (req, res) => {
         ,queja.Nombres
         ,queja.Apellidos
         ,queja.Correo_email
-        ,estado.Descripcion FROM heroku_6f18d24c0ac41a5.tbl_queja AS queja
-        JOIN heroku_6f18d24c0ac41a5.tbl_estado AS estado ON queja.Id_EstadoIni = estado.Id_Estado WHERE queja.Siglas= '${Siglas}'`;
+        ,estado.Descripcion FROM quejastulio.tbl_queja AS queja
+        JOIN quejastulio.tbl_estado AS estado ON queja.Id_EstadoIni = estado.Id_Estado WHERE queja.Siglas= '${Siglas}'`;
         console.log(consulta);
         var resultadoConsulta = await realizarConsulta(consulta);
         console.log(resultadoConsulta);

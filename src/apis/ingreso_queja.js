@@ -3,7 +3,7 @@ const path = require('path');
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const secret = "123456";
-const tabla = 'heroku_6f18d24c0ac41a5.tbl_queja';
+const tabla = 'quejastulio.tbl_queja';
 const multer = require('multer');
 const fs = require('fs');
 var { conexion, realizarConsulta, realizarDml } = require('../db/conexion');
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
         const token = req.headers.authorization.split(" ")[1];
         const payload = jwt.verify(token, secret);
         const { Nombres, Apellidos, Correo_email, Telefono, Detalle, Id_TQueja, Id_Origen } = req.body;
-        var consulta = `select * from heroku_6f18d24c0ac41a5.tbl_tipo_queja where Id_Tqueja = ${Id_TQueja}`;
+        var consulta = `select * from quejastulio.tbl_tipo_queja where Id_Tqueja = ${Id_TQueja}`;
         var tiposQueja = await realizarConsulta(consulta);
         const currentDate = new Date();
         const day = String(currentDate.getDate()).padStart(2, '0');
@@ -84,9 +84,9 @@ const storage = multer.diskStorage({
                     });
             }
 
-            consulta = `update heroku_6f18d24c0ac41a5.tbl_tipo_queja set Correlativo = ${parseInt(tiposQueja[0]['Correlativo'] + 1)} where Id_Tqueja = ${Id_TQueja}`;
+            consulta = `update quejastulio.tbl_tipo_queja set Correlativo = ${parseInt(tiposQueja[0]['Correlativo'] + 1)} where Id_Tqueja = ${Id_TQueja}`;
             await realizarDml(consulta);
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"insertar"}',
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"insertar"}',
             'Descripcion: ${Detalle}, Nombres: ${Nombres} + ${Apellidos}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             await realizarDml(consulta);
@@ -127,7 +127,7 @@ router.post("/actualizarTipoQueja", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}',
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"actualizar"}',
             'Id: ${Id_TQueja},Descripcion: ${Descripcion}, Siglas:${Siglas}', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
@@ -150,7 +150,7 @@ router.post("/eliminarTipoQueja", async (req, res) =>{
         var resultadoConsulta = await realizarDml(consulta);
         console.log(resultadoConsulta);
         if (resultadoConsulta == true){    
-            consulta = `insert into heroku_6f18d24c0ac41a5.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"eliminar"}', 'Id: ${Id_TQueja}, Estado: 2', '${payload.user}', ${"Current_Timestamp"})`;
+            consulta = `insert into quejastulio.tbl_bitacora_db(Tbl_Nombre, Accion, Registro_Despues, Usuario, Fecha) VALUES ('${tabla}', '${"eliminar"}', 'Id: ${Id_TQueja}, Estado: 2', '${payload.user}', ${"Current_Timestamp"})`;
             console.log(consulta);
             var resultadoConsulta = await realizarDml(consulta);            
             res.status(200).send({ Ok: "Ok" });
