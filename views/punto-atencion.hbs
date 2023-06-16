@@ -1,0 +1,131 @@
+
+
+<form id="login" class="container g-3 mt-5" method="POST">
+    <div class="col-lg-12 justify-content-center ">
+        <table class="table table-striped" id="tableData">
+            <caption>
+                <button id="buttonAgregar" type="button" onclick="window.location='puntoatencion/agregar'" class="btn btn-success">Agregar</button>
+            </caption>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Punto atencion</th>
+                    <th>Acccion</th>
+                </tr>
+            </thead>
+            <tbody id="idBody"></tbody>
+
+        </table>
+    </div>
+</form>
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        await tipoQuejas();
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    tipoQuejas = async () => {
+
+        const response = await fetch('/api/punto_atencion/obtenerPuntos', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            resultadoConsulta.forEach(e => {
+                let descripcion = e.Descripcion;
+                let id_punto = e.Id_PuntoA;
+
+                table += `
+                    <tr>
+                        <td>${id_punto}</td>
+                        <td>${descripcion}</td>
+                        <td>
+                            <button id="modificar${id_punto}" class="btn btn-success">Modificar</button>
+                            <button id="eliminar${id_punto}" onclick="eliminarPunto(${id_punto})" type="button" class="btn btn-danger">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+
+            });
+            document.getElementById('idBody').insertAdjacentHTML('beforeend', table);
+
+            $('#tableData').dataTable({
+                "language": {
+                    "sProcessing":    "Procesando...",
+                    "sLengthMenu":    "Mostrar _MENU_ registros",
+                    "sZeroRecords":   "No se encontraron resultados",
+                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
+                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":   "",
+                    "sSearch":        "Buscar:",
+                    "sUrl":           "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":    "Último",
+                        "sNext":    "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    eliminarPunto = async (id) => {
+
+        data = JSON.stringify({
+            Id_PuntoA : id,
+        })
+
+        const response = await fetch('/api/punto_atencion/eliminarPunto', {
+            method:"POST",
+            headers:header,
+            body: data,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        let statusCode = response.status;
+        let body = response.body;
+        if (statusCode == 200){
+            Swal.fire({
+                icon: 'success',
+                text: 'Punto de atencion , desactivado',
+                allowOutsideClick: false
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    window.location = '/puntoatencion'
+                }
+            })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en el servidor',
+            });
+        }
+    }
+</script>

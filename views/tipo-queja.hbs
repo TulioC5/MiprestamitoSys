@@ -1,0 +1,134 @@
+
+
+<form id="login" class="container g-3 mt-5" method="POST">
+    <div class="col-lg-12 justify-content-center ">
+        <table class="table table-striped" id="tableData">
+            <caption>
+                <button id="buttonAgregar" type="button" onclick="window.location='tipoqueja/agregar'" class="btn btn-success">Agregar</button>
+            </caption>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo queja</th>
+                    <th>Descripcion</th>
+                    <th>Acccion</th>
+                </tr>
+            </thead>
+            <tbody id="idBody"></tbody>
+
+        </table>
+    </div>
+</form>
+<script type="text/javascript">
+    let jwt = localStorage.jwt;
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`)
+    header.append('Accept', `application/json`)
+    header.append('Content-Type', `application/json`)
+
+    document.addEventListener('DOMContentLoaded', async e => {
+        await tipoQuejas();
+        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    });
+
+    tipoQuejas = async () => {
+
+        const response = await fetch('/api/tipo_queja/obtenerTipoQueja', {
+            method:"GET",
+            headers:header,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+
+        let statusCode = response.status;
+        let body = response.body;
+        let table = ``;
+
+        if (statusCode == 200){
+            let resultadoConsulta = body.resultadoConsulta;
+            resultadoConsulta.forEach(e => {
+                let descripcion = e.Descripcion;
+                let Siglas = e.Siglas;
+                let Id_Tqueja = e.Id_Tqueja;
+
+                table += `
+                    <tr>
+                        <td>${Id_Tqueja}</td>
+                        <td>${Siglas}</td>
+                        <td>${descripcion}</td>
+                        <td>
+                            <button id="modificar${Id_Tqueja}" class="btn btn-success">Modificar</button>
+                            <button id="eliminar${Id_Tqueja}" onclick="eliminar(${Id_Tqueja})" type="button" class="btn btn-danger">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+
+            });
+            document.getElementById('idBody').insertAdjacentHTML('beforeend', table);
+
+            $('#tableData').dataTable({
+                "language": {
+                    "sProcessing":    "Procesando...",
+                    "sLengthMenu":    "Mostrar _MENU_ registros",
+                    "sZeroRecords":   "No se encontraron resultados",
+                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
+                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":   "",
+                    "sSearch":        "Buscar:",
+                    "sUrl":           "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":    "Último",
+                        "sNext":    "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en obtener listado',
+            });
+        }
+    }
+
+    eliminar = async (id) => {
+
+        data = JSON.stringify({
+            Id_TQueja : id,
+        })
+
+        const response = await fetch('/api/tipo_queja/eliminarTipoQueja', {
+            method:"POST",
+            headers:header,
+            body: data,
+        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+
+        let statusCode = response.status;
+        let body = response.body;
+        if (statusCode == 200){
+            Swal.fire({
+                icon: 'success',
+                text: 'Tipo de queja , desactivado',
+                allowOutsideClick: false
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    window.location = '/tipoqueja'
+                }
+            })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                text: 'Hubo un error en el servidor',
+            });
+        }
+    }
+</script>
