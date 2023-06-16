@@ -18,9 +18,13 @@ const quejai = require("./src/apis/quejas_ingresadas")
 const usuarioRoute = require("./src/apis/usuarios")
 
 
+const port = process.env.PORT || 3000; // Usar el puerto proporcionado por Heroku o el puerto 3000 de forma predeterminada
+app.listen(port, () => {
+  console.log(`Servidor escuchando en el puerto ${port}`);
+});
 
 
-const port = 3000
+// const port = 3000
 
 app.use( bodyParser.json({limit: '50mb'}) );
 app.use(bodyParser.urlencoded({
