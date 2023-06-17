@@ -50,12 +50,16 @@
     header.append('Accept', `application/json`)
     header.append('Content-Type', `application/json`)
 
-    document.addEventListener('DOMContentLoaded', async e => {
-        await medioQuejas();
-        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
-        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+ document.addEventListener('DOMContentLoaded', async e => {
+    await medioQuejas();
+    document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+    document.getElementById('divnavbarSupportedContent').style.display = 'none';
 
-    });
+    let jwt = localStorage.getItem('jwt');
+    if (jwt) {
+        enviarTokenAlBackend(jwt);
+    }
+});
 
     medioQuejas = async () => {
         document.getElementById('medioQuejasDiv').innerHTML = '';
@@ -119,7 +123,9 @@
         let fileArchivo = document.getElementById('fileArchivo')
         let siglaID = document.getElementById('siglaID');
 
-
+        if (jwt) {
+        enviarTokenAlBackend(jwt);
+    }
         if (radios == null){
             Swal.fire({
                 icon: 'error',
@@ -127,6 +133,20 @@
             });
             return
         }
+
+        enviarTokenAlBackend = async (jwt) => {
+    const header = new Headers();
+    header.append('authorization', `Bearer ${jwt}`);
+    header.append('Accept', `application/json`);
+    header.append('Content-Type', `application/json`);
+
+    // Realiza la solicitud al backend enviando el token en el encabezado 'Authorization'
+    const response = await fetch('/ruta_al_backend', {
+        method: 'POST',
+        headers: header,
+        // Resto de los parámetros de la solicitud...
+    });
+
 
         if (nombre.value == ''){
             Swal.fire({
