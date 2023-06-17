@@ -46,6 +46,7 @@
 <script type="text/javascript">
     let jwt = localStorage.jwt;
     const header = new Headers();
+
     header.append('authorization', `Bearer ${jwt}`)
     header.append('Accept', `application/json`)
     header.append('Content-Type', `application/json`)
@@ -55,6 +56,9 @@
         document.getElementById('divnavbarSupporteMenu').style.display = 'block';
         document.getElementById('divnavbarSupportedContent').style.display = 'none';
 
+                console.log('Encabezado de autorización:', jwt );
+
+
     });
 
     medioQuejas = async () => {
@@ -62,9 +66,11 @@
         const response = await fetch('/api/tipo_queja/obtenerOrigenQueja', {
             method:"GET",
             headers:header,
+
+            
         }).then(res => res.json().then(data => ({status: res.status, body: data})));
 
-
+        console.log('Encabezado de autorización:', header );
         let statusCode = response.status;
         let body = response.body;
         let table = ``;
@@ -185,8 +191,6 @@
         }
 
         const file = fileArchivo.files[0];
-        const header = new Headers();
-        header.append('authorization', `Bearer ${jwt}`)
 
         var data = new FormData()
         data.append('Nombres', nombre.value)
