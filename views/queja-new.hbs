@@ -186,10 +186,7 @@
 
         const file = fileArchivo.files[0];
         const header = new Headers();
-        let jwt = localStorage.jwt;
-        const header = new Headers();
         header.append('authorization', `Bearer ${jwt}`)
-          
 
         var data = new FormData()
         data.append('Nombres', nombre.value)
@@ -208,10 +205,10 @@
         let statusCode = response.status;
         let body = response.body;
 
-        if (statusCode == 401){
+        if (statusCode == 201){
             Swal.fire({
                 icon: 'success',
-                text: 'Agradecemos su comunicación, le informamos que su queja ha sido recibida exitosamente. Para el seguimiento o cualquier consulta relacionada, no olvide revisar su correo',
+                text: 'Dato guardado',
                 allowOutsideClick: false
             }).then(function(isConfirm) {
                 if (isConfirm) {
