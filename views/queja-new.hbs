@@ -1,10 +1,10 @@
 <input type="hidden" id="siglaID" value="{{sigla}}">
 <div class="container">
     <div id="login" class="row justify-content-center">
-        <div class="col-lg-7 ">
+        <div class="col-lg-7">
             <div class="col-12">
                 <div class="form-outline mb-3">
-                    <label class="form-label">Por medio de </label>
+                    <label class="form-label">Por medio de</label>
                     <div class="col-12" id="medioQuejasDiv">
                     </div>
                 </div>
@@ -17,7 +17,7 @@
                     <input required type="text" class="form-control" id="correo" name="correo">
                 </div>
                 <div class="form-outline mb-3">
-                    <label class="form-label">Telefono</label>
+                    <label class="form-label">Teléfono</label>
                     <input required type="text" class="form-control" id="telefono" name="telefono">
                 </div>
                 <div class="form-outline mb-3">
@@ -34,7 +34,7 @@
                 </div>
                 <div class="form-outline mb-3">
                     <label class="form-label">Archivo</label>
-                    <input class="form-control" type="file" id="fileArchivo"  name="fileArchivo">
+                    <input class="form-control" type="file" id="fileArchivo" name="fileArchivo">
                 </div>
                 <div class="form-outline mb-4">
                     <button class="btn btn-success" onclick="guardarValidacion()" type="button">Guardar</button>
@@ -54,22 +54,20 @@
         await medioQuejas();
         document.getElementById('divnavbarSupporteMenu').style.display = 'block';
         document.getElementById('divnavbarSupportedContent').style.display = 'none';
-
     });
 
     medioQuejas = async () => {
         document.getElementById('medioQuejasDiv').innerHTML = '';
         const response = await fetch('/api/tipo_queja/obtenerOrigenQueja', {
-            method:"GET",
-            headers:header,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
-
+            method: "GET",
+            headers: header,
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
 
         let statusCode = response.status;
         let body = response.body;
         let table = ``;
 
-        if (statusCode == 200){
+        if (statusCode == 200) {
             let resultadoConsulta = body.resultadoConsulta;
             resultadoConsulta.forEach(e => {
                 let id = e.Id_Origen;
@@ -83,11 +81,10 @@
                 `;
                 document.getElementById('medioQuejasDiv').insertAdjacentHTML('beforeend', html);
             });
-
-        }else{
+        } else {
             Swal.fire({
                 icon: 'error',
-                text: 'Hubo un error en obtener orignes quejas',
+                text: 'Hubo un error al obtener los orígenes de las quejas',
             });
         }
     }
@@ -107,9 +104,9 @@
         });
     };
 
-    guardarValidacion = async () =>{
+    guardarValidacion = async () => {
 
-        let radios = document.querySelector('input[name = "checkOrigenQuejas"]:checked');
+        let radios = document.querySelector('input[name="checkOrigenQuejas"]:checked');
         let nombre = document.getElementById('nombre')
         let correo = document.getElementById('correo')
         let telefono = document.getElementById('telefono')
@@ -119,69 +116,68 @@
         let fileArchivo = document.getElementById('fileArchivo')
         let siglaID = document.getElementById('siglaID');
 
-
-        if (radios == null){
+        if (radios == null) {
             Swal.fire({
                 icon: 'error',
-                text: 'Seleccione origen queja',
+                text: 'Seleccione un origen de queja',
             });
-            return
+            return;
         }
 
-        if (nombre.value == ''){
+        if (nombre.value === '') {
             Swal.fire({
                 icon: 'error',
                 text: 'Ingrese un nombre',
             });
-            return
+            return;
         }
 
-        if (correo.value == ''){
+        if (correo.value === '') {
             Swal.fire({
                 icon: 'error',
-                text: 'Ingrese correo',
+                text: 'Ingrese un correo',
             });
-            return
+            return;
         }
 
-        if (telefono.value == ''){
+        if (telefono.value === '') {
             Swal.fire({
                 icon: 'error',
-                text: 'Ingrese telefono',
+                text: 'Ingrese un teléfono',
             });
-            return
+            return;
         }
 
-        if (oficina.value == ''){
+        if (oficina.value === '') {
             Swal.fire({
                 icon: 'error',
-                text: 'Seleccione oficina',
+                text: 'Seleccione una oficina',
             });
-            return
+            return;
         }
 
-        if (nombre_empleado.value == ''){
+        if (nombre_empleado.value === '') {
             Swal.fire({
                 icon: 'error',
-                text: 'Ingrese nombre empleado',
+                text: 'Ingrese el nombre del empleado',
             });
-            return
+            return;
         }
 
-        if (detalle_queja.value == ''){
+        if (detalle_queja.value === '') {
             Swal.fire({
                 icon: 'error',
-                text: 'Ingrese detalle queja',
+                text: 'Ingrese el detalle de la queja',
             });
-            return
+            return;
         }
 
-        if (fileArchivo.value == ''){
+        if (fileArchivo.value === '') {
             Swal.fire({
                 icon: 'error',
                 text: 'Seleccione un archivo',
             });
-            return
+            return;
         }
 
         const file = fileArchivo.files[0];
@@ -197,28 +193,30 @@
         data.append('Id_TQueja', siglaID.value)
         data.append('Id_Origen', radios.value)
         data.append('File', file)
+
         const response = await fetch('/api/ingreso/ingresarQueja', {
-            method:"POST",
+            method: "POST",
             headers: header,
             body: data,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+        }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
         let statusCode = response.status;
         let body = response.body;
 
-        if (statusCode == 401){
+        if (statusCode == 201) {
             Swal.fire({
                 icon: 'success',
                 text: 'Dato guardado',
                 allowOutsideClick: false
-            }).then(function(isConfirm) {
+            }).then(function (isConfirm) {
                 if (isConfirm) {
                     window.location = `/queja?sigla=${siglaID.value}`
                 }
             })
-        }else{
+        } else {
             Swal.fire({
                 icon: 'error',
-                text: 'Hubo un error en guardar los datos',
+                text: 'Hubo un error al guardar los datos',
                 allowOutsideClick: false
             });
         }
