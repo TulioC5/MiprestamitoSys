@@ -1,176 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container">
-    <div id="login" class="row justify-content-center" method="POST">
-        <div class="col-lg-7 ">
-            <div class="row col-12 ">
-                <div class="col-6">
-                    <label class="form-label">Fecha inicial</label>
-                    <input required type="text" class="form-control" id="desde" name="desde">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Fecha final</label>
-                    <input required type="text" class="form-control" id="hasta" name="hasta">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Region</label>
-                    <input required type="text" class="form-control" id="desde" name="desde">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Punto Atencion</label>
-                    <input required type="text" class="form-control" id="hasta" name="hasta">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Queja</label>
-                    <input required type="text" class="form-control" id="hasta" name="hasta">
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Filtros</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+</head>
 
-                <div class="form-outline mt-2">
-                    <button class="btn btn-success" id="btnBuscar" type="button">Buscar</button>
+<body>
+    <div class="container">
+        <div id="login" class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="row col-12">
+                    <div class="col-6">
+                        <label class="form-label">Fecha inicial</label>
+                        <input required type="text" class="form-control datepicker" id="desde" name="desde">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Fecha final</label>
+                        <input required type="text" class="form-control datepicker" id="hasta" name="hasta">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Región</label>
+                        <input required type="text" class="form-control" id="region" name="region">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Punto Atención</label>
+                        <input required type="text" class="form-control" id="puntoAtencion" name="puntoAtencion">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Queja</label>
+                        <input required type="text" class="form-control" id="queja" name="queja">
+                    </div>
+                    <div class="form-outline mt-2">
+                        <button class="btn btn-success" id="btnBuscar" type="button">Buscar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-12 mt-5">
-            <table class="table table-striped" id="tableData">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Tipo</th>
-                    <th>Punto A</th>
-                    <th>Estado</th>
-                    <th>Etapa/Actual</th>
-                    <th>Resultado</th>
-                    <th>Medio Ing.</th>
-                    <th>Fecha C</th>
-                    <th>Tiempo de atencion</th>
-                    <th>Detalle</th>
-                </tr>
-                </thead>
-                <tbody id="idBody"></tbody>
-
-            </table>
+            <div class="col-lg-12 mt-5">
+                <table class="table table-striped" id="tableData">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tipo Q</th>
+                            <th>Region</th>
+                            <th>Siglas</th>
+                            <th>Medio Ing.</th>
+                            <th>FechaQ</th>
+                            <th>Tiempo de atención</th>
+                            <th>Estado Actual</th>
+                            <th>DetalleQ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="idBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<script type="text/javascript">
-    let jwt = localStorage.jwt;
-    const header = new Headers();
-    header.append('authorization', `Bearer ${jwt}`)
-    header.append('Accept', `application/json`)
-    header.append('Content-Type', `application/json`)
 
-    document.addEventListener('DOMContentLoaded', async e => {
-        document.getElementById('divnavbarSupporteMenu').style.display = 'block';
-        document.getElementById('divnavbarSupportedContent').style.display = 'none';
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        let jwt = localStorage.jwt;
+        const header = new Headers();
+        header.append('authorization', `Bearer ${jwt}`)
+        header.append('Accept', `application/json`)
+        header.append('Content-Type', `application/json`)
 
-        document.getElementById('btnBuscar').addEventListener('click', async function(){
-            await buscar();
-        })
-    });
+        document.addEventListener('DOMContentLoaded', async e => {
+            document.getElementById('divnavbarSupporteMenu').style.display = 'block';
+            document.getElementById('divnavbarSupportedContent').style.display = 'none';
 
+            document.getElementById('btnBuscar').addEventListener('click', async function () {
+                await buscar();
+            });
 
-    buscar = async () =>{
-        // let siglas =  document.getElementById('siglas').value;
-        //
-        // if (siglas == ''){
-        //     Swal.fire({
-        //         icon: 'error',
-        //         text: 'Ingrese siglas',
-        //     });
-        //     return
-        // }
-        //
-        // if (recap == ''){
-        //     Swal.fire({
-        //         icon: 'error',
-        //         text: 'Valide recaptcha',
-        //     });
-        //     return
-        // }
-        //
-        let data = JSON.stringify({
-            // recap : recap,
-            Siglas: '',
+            // Inicializar los selectores de fecha con Flatpickr
+            flatpickr('.datepicker', {
+                dateFormat: 'Y-m-d', // Formato de fecha (puedes ajustarlo según tus necesidades)
+            });
         });
 
+        buscar = async () => {
+  let desde = document.getElementById('desde').value;
+  let hasta = document.getElementById('hasta').value;
+  let region = document.getElementById('region').value;
+  let puntoAtencion = document.getElementById('puntoAtencion').value;
+  let queja = document.getElementById('queja').value;
 
-        const response = await fetch('/api/ingreso/obtenerTipoQueja', {
-            method:"GET",
-            headers: header,
-            // body:data,
-        }).then(res => res.json().then(data => ({status: res.status, body: data})));
+  let data = {
+    desde: desde,
+    hasta: hasta,
+    region: region,
+    puntoAtencion: puntoAtencion,
+    queja: queja
+  };
+
+  const response = await fetch('/api/tipo_queja/obtenerq', {
+    method: "GET",
+    headers: header,
+  }).then(res => res.json().then(data => ({ status: res.status, body: data })));
+
+  let statusCode = response.status;
+  let body = response.body;
+  let table = ``;
+
+  if (statusCode == 200) {
+    let resultadoConsulta = body.resultadoConsulta;
+
+    resultadoConsulta.forEach((e, index) => {
+      let descripcion = e.Descripcion;
+      let Siglas = e.Siglas;
+      let Id_Tqueja = e.Id_Tqueja;
+      let Estado = e.Estado;
+      let Descripcion_Origen = e.Descripcion_Origen;
+      let Fecha_Queja = e.Fecha_Queja;
+            let Descripcion2 = e.Descripcion2;
+            let Detalles = e.Detalles;
+                        let Descripcion3 = e.Descripcion3;
 
 
-        let statusCode = response.status;
-        let body = response.body;
-        let table = ``;
 
-        if (statusCode == 201){
-            let resultadoConsulta = body.resultadoConsulta;
-            resultadoConsulta.forEach(e => {
-                let descripcion = e.Descripcion;
-                let Siglas = e.Siglas;
-                let Id_Tqueja = e.Id_Tqueja;
 
-                table += `
-                    <tr>
-                        <td>No</td>
-                        <td>Tipo</td>
-                        <td>Punto A</td>
-                        <td>Estado</td>
-                        <td>Etapa/Actual</td>
-                        <td>Resultado</td>
-                        <td>Medio Ing.</td>
-                        <td>Fecha C</td>
-                        <td>Tiempo de atencion</td>
-                        <td>Detalle</td>
-                    </tr>
-                `;
 
-            });
-            document.getElementById('idBody').insertAdjacentHTML('beforeend', table);
 
-            let tableD = $('#tableData').dataTable({
-                "paging": false,
-                "info": false,
-                "dom": 'Bfrtip',
-                "searching":false,
-                "ordering":false,
-                buttons: {
-                    buttons: [
-                        { extend: 'excel', className: 'btn-success btn' },
-                        { extend: 'pdf', className: 'btn-danger btn' }
-                    ]
-                },
-                "language": {
-                    "sProcessing":    "Procesando...",
-                    "sLengthMenu":    "Mostrar _MENU_ registros",
-                    "sZeroRecords":   "No se encontraron resultados",
-                    "sEmptyTable":    "Ningún dato disponible en esta tabla",
-                    "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix":   "",
-                    "sSearch":        "Buscar:",
-                    "sUrl":           "",
-                    "sInfoThousands":  ",",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst":    "Primero",
-                        "sLast":    "Último",
-                        "sNext":    "Siguiente",
-                        "sPrevious": "Anterior"
-                    },
-                    "oAria": {
-                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                    }
-                }
-            });
-        }else{
-            Swal.fire({
-                icon: 'error',
-                text: 'Hubo un error en obtener listado',
-            });
+
+
+      table += `
+        <tr>
+          <td>${index + 1}</td>
+         <td>${Descripcion3}</td>
+          <td>${Descripcion2}</td>
+                    <td>${Siglas}</td>
+          <td>${Descripcion_Origen}</td>
+          <td>${Fecha_Queja}</td>
+          <td>Tiempo de atención</td>
+         <td>${descripcion}</td>
+          <td>${Detalles}</td>
+
+        </tr>
+      `;
+    });
+
+    document.getElementById('idBody').innerHTML = table;
+
+    $('#tableData').DataTable().destroy(); // Destruye la tabla existente antes de recrearla
+
+    $('#tableData').DataTable({
+      dom: 'Bfrtip',
+      buttons: ['excel', 'pdf'],
+      language: {
+        // Configuración del idioma de la tabla
+        search: 'Buscar:',
+        lengthMenu: 'Mostrar _MENU_ registros',
+        info: 'Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros',
+        infoEmpty: 'Mostrando registros del 0 al 0 de un total de 0 registros',
+        infoFiltered: '(filtrado de un total de _MAX_ registros)',
+        zeroRecords: 'No se encontraron resultados',
+        emptyTable: 'Ningún dato disponible en esta tabla',
+        loadingRecords: 'Cargando...',
+        paginate: {
+          first: 'Primero',
+          last: 'Último',
+          next: 'Siguiente',
+          previous: 'Anterior'
+        },
+        aria: {
+          sortAscending: ': Activar para ordenar la columna de manera ascendente',
+          sortDescending: ': Activar para ordenar la columna de manera descendente'
         }
-    }
-</script>
+      }
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      text: 'Hubo un error al obtener el listado',
+    });
+  }
+};
+
+    </script>
+</body>
+
+</html>
