@@ -186,7 +186,10 @@
 
         const file = fileArchivo.files[0];
         const header = new Headers();
+        let jwt = localStorage.jwt;
+        const header = new Headers();
         header.append('authorization', `Bearer ${jwt}`)
+          
 
         var data = new FormData()
         data.append('Nombres', nombre.value)
